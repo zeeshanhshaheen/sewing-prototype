@@ -10,7 +10,7 @@ interface SvgViewerProps {
   }) => void;
 }
 
-interface ExtendedSVGPathElement extends SVGPathElement {
+interface ExtendedSVGElement extends SVGElement {
   _clickHandler?: (e: Event) => void;
 }
 
@@ -24,26 +24,38 @@ export default function SvgViewer({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const svg = container.querySelector('svg');
-    if (!svg) return;
-    const paths = svg.querySelectorAll('path');
-    paths.forEach(path => {
-      path.style.cursor = 'pointer';
+    const svgElement = container.querySelector('svg');
+    if (!svgElement) return;
+
+    // Force the SVG to fill its container while maintaining aspect ratio
+    svgElement.setAttribute('width', '100%');
+    svgElement.setAttribute('height', '100%');
+    svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    (svgElement as SVGElement).style.display = 'block';
+
+    // Find all <path> and <polygon> elements
+    const elements = svgElement.querySelectorAll('path, polygon');
+    console.log('Found clickable elements:', elements.length);
+    elements.forEach(el => {
+      (el as SVGElement).style.cursor = 'pointer';
       const clickHandler = (e: Event) => {
         e.stopPropagation();
-        path.classList.toggle('selected-edge');
-        const edgeData = { d: path.getAttribute('d'), type };
-        onEdgeSelect(edgeData);
+        (el as SVGElement).classList.toggle('selected-edge');
+        let data = el.getAttribute('d');
+        if (!data && el.tagName.toLowerCase() === 'polygon') {
+          data = el.getAttribute('points');
+        }
+        onEdgeSelect({ d: data, type });
       };
-      path.addEventListener('click', clickHandler);
-      const extendedPath = path as ExtendedSVGPathElement;
-      extendedPath._clickHandler = clickHandler;
+      el.addEventListener('click', clickHandler);
+      const extendedEl = el as ExtendedSVGElement;
+      extendedEl._clickHandler = clickHandler;
     });
     return () => {
-      paths.forEach(path => {
-        const extendedPath = path as ExtendedSVGPathElement;
-        if (extendedPath._clickHandler) {
-          extendedPath.removeEventListener('click', extendedPath._clickHandler);
+      elements.forEach(el => {
+        const extendedEl = el as ExtendedSVGElement;
+        if (extendedEl._clickHandler) {
+          el.removeEventListener('click', extendedEl._clickHandler);
         }
       });
     };
@@ -52,14 +64,8 @@ export default function SvgViewer({
   return (
     <div
       ref={containerRef}
-      className='
-        border border-gray-300
-        rounded shadow-sm
-        overflow-hidden bg-white
-        w-[200px] h-[300px]
-        md:w-[250px] md:h-[375px]
-      '
+      className='relative w-full h-[275px] md:h-[325px] border border-gray-300 rounded shadow-sm bg-white overflow-hidden'
       dangerouslySetInnerHTML={{ __html: svgContent }}
-    />
+    ></div>
   );
 }
