@@ -41,6 +41,15 @@ Project Structure
 /components
   ├── pattern-uploader.tsx        # SVG uploader for front and back pieces
   ├── two-d-pattern-view.tsx      # Interactive 2D pairing interface
+```
+Libraries & Tools
+Library	Purpose
+Next.js	React app framework
+Tailwind CSS	UI styling
+Three.js	3D rendering
+SVGLoader	SVG parsing for geometry
+OrbitControls	Interactive camera controls
+Lucide React	Icons
   └── enhanced-three-d-preview.tsx# 3D visualization using Three.js
 /pages
   └── index.tsx                   # Main UI layout
