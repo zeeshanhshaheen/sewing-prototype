@@ -8,7 +8,9 @@ import EnhancedThreeDPreview from './components/enhanced-three-d-preview';
 export default function Home() {
   const [frontPieceData, setFrontPieceData] = useState<string | null>(null);
   const [backPieceData, setBackPieceData] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sewingPairs, setSewingPairs] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [tempPoint, setTempPoint] = useState<any>(null);
 
   return (
